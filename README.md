@@ -1,4 +1,4 @@
-# Rails JS Template (Under Development)
+# Spring is NEAR Challenge 6: Zoo NFT by NEAR Ukraine
 
 The first thing is to recreate master key and credentials. 
 
@@ -14,9 +14,19 @@ rails db:migrate
 
 Everything should be fine after that. Try to start `rails s` and see if it starts or not. 
 
+```
+rails s
+```
+
 ---
 
-## Improvements Required
-- There are quite a lot of tests required for this repository. 
-- Handling ajax to send request to backend; or just do sign and send transactions from the backend if user not scared of hacked database (which most probably lead to small sum stolen per user, given the limit of the private key stored). 
-- Waiting for `near_api` gem to improve... 
+## Problem Statement: Challenge #6. Zoo NFT by NEAR Ukraine
+The war in Ukraine has affected each Ukrainian and a lot of people around the globe. At the moment the war is being actively waged and is in the hot phase, but when Ukraine wins, a new stage will begin - the stage of restoration of our country.  
+
+Ukrainian zoos are in severe need of help now and will be in need after the war ends. There are no visitors in the zoos, which results in no budgeting.
+
+You need to create an NFT project which will aid in attracting funds that will be allocated to buy food for animals or help zoos restore their work after the war is over.
+
+This challenge is a part of the “For Ukraine” hackathon by 🇺🇦near-ua . Your submission will be eligible for both NEAR Spring and “For Ukraine” bounties. More info here: https://eventornado.com/event/near-hackathon-for-ukraine/
+
+---
