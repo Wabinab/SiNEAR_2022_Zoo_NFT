@@ -19,6 +19,13 @@ EDITOR="code ." bin/rails credentials:edit
 rails db:migrate
 ```
 
+Then we need to install bootstrap. (Ignore the error, it'll auto install upon cannot find bootstrap). 
+This requires yarn and node js. 
+
+```
+bash rebuild.sh
+```
+
 Everything should be fine after that. Try to start `rails s` and see if it starts or not. 
 
 ```
