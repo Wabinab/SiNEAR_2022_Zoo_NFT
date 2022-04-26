@@ -8,6 +8,7 @@ module UsersHelper
     @query = NearApi::Query.new(config = @conf)
 
     @contract = 'greeter.wabinab.testnet'
+    @contract2 = 'f_nft.wabinab.testnet'
   end
 
   def gravatar_for(user)
@@ -36,5 +37,16 @@ module UsersHelper
         "account_id": account_id
       }
     )["result"]["result"].pack('c*')
+  end
+
+  def get_tokens(account_id)
+    JSON.parse(@query.function(
+      @contract2,
+      'nft_tokens_for_owner',
+      {
+        "account_id": account_id,
+        "limit": 10
+      }
+    )["result"]["result"].pack('c*'))
   end
 end

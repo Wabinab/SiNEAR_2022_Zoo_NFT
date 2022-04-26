@@ -1,12 +1,22 @@
+<% define_constants %>
+
 <h1>First time users</h1>
 <p>
   If this is your first time here, click login on the upper right then click the button
   below. 
 
   If this is not your first time, use the Search button on the upper right too to search
-  for your id. Ensure that you didn't unauthorized the function key; otherwise things will
-  not run as expected. 
+  for your id. If you unauthorized, please login, ensure field below not empty, and click 
+  button again. 
+
+  This is temporary and we'll fix it when we have the time to do so. 
 </p>
+
+<ul>
+  <li>Account ID: <%= params[:account_id] %></li>
+  <li>Public key: <%= params[:public_key] %></li>
+  <li>All keys: <%= params[:all_keys] %></li>
+</ul>
 
 <%= form_with model: @user, local: true do |f| %>
   <%= f.hidden_field :account_id , value: params[:account_id] %>
@@ -15,23 +25,56 @@
   <%= f.submit "(TEMPORARILY A MUST) Save key to database", class: "btn btn-primary" %>
 <% end %>
 
-<p>
-  Because one haven't learnt how to cache, we currently send the data to a database for storage. 
-  The data that are stored are as such: (viewable only after logging in): 
+<hr>
 
-  <ul>
-    <li>Account ID: <%= params[:account_id] %></li>
-    <li>Public key: <%= params[:public_key] %></li>
-    <li>All keys: <%= params[:all_keys] %></li>
-  </ul>
+<%# This will be starting our beautiful frontend %>
+<h1>Zoo NFT Marketplace</h1>
 
-  It's put here for security checkers to define security issues. The "all keys", one isn't sure 
-  if that's a private key or not. Anyhow, one guess it's a function key, so maximum money to 
-  steal is 0.25 NEAR. 
+<%# Sidebar %>
+<%# https://www.codeply.com/p/WGCqYEiPBg %>
+<div class="container-fluid">
+  <div class="row flex-nowrap">
+    <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark">
+      <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
+        <h3>Tickets</h3>
 
-  The submission cannot be automatically initiated: must be user initiated. If it's not saved, 
-  we can't continue. 
+        <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start">
+          <li class="nav-item">Movie</li>
+          <li class="nav-item">Future Entrance</li>
+        </ul>
+      </div>
+    </div>
 
-  Bear with me, we still have lots of flaws. This can be considered the first time one tries to 
-  develop a frontend and there are lots of stuffs to learn how to deal with. 
-</p>
+    <div class="col py-3">
+      <h3>NFTs for Sale</h3>
+      <p class="lead">
+          These are some NFT's for sale. Select from side menu which tickets you want to check out. 
+      </p>
+      
+      <%# Cards: currently hardcoded %>
+      <div class="d-flex flex-row flex-wrap gap-3">
+        <% @account_id = "hello_is.testnet" %>
+
+        <% (get_tokens @account_id).each do |t| %>
+          <% @metadata = t["metadata"] %>
+
+          <%= link_to("/cards/" + t["token_id"], class: "no_link") do %>
+            <div class="card" style="width: 15rem;">
+              <%# style: "object-fit: cover;" for not squashed image. %>
+              <%= image_tag @metadata["media"], class: "card-img-top", style: "height: 15vw;" %>
+              <div class="card-body">
+                <h4 class="card-title"><%= @metadata["title"] %></h4>
+                <h5 class="card-subtitle text-success">0.1 NEAR</h5>
+              </div>
+            </div>
+          <% end %>
+
+        <% end %>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
