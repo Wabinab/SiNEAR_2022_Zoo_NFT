@@ -1,0 +1,40 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container-fluid">
+    <%= link_to "NEAR Greeter", root_path, class: "navbar-brand me-auto", id: "logo" %>
+
+    <button
+      class="navbar-toggler bg-light"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarTogglerDemo02"
+      aria-controls="navbarTogglerDemo02"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <%= link_to "Login", "javascript:login()" , class: "nav-link active" %>
+        </li>
+
+        <li class="nav-item">
+          <%= link_to "Logout", "javascript:logout()", class: "nav-link active" %>
+        </li>
+
+        <li class="nav-item">
+          <%= form_with(url: "/users", method: :get, local: true) do |f| %>
+            <%= f.text_field :account_id, placeholder: "wabinab.testnet" %>
+            <%= f.submit "Search", class: "btn btn-outline-success" %>
+          <% end %>
+        </li>
+      </ul>
+
+    </div>
+    
+    
+  </div>
+</nav>

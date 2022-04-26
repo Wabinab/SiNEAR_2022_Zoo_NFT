@@ -1,0 +1,56 @@
+<% define_constants %>
+
+<div class="row">
+  <div class="col text-center">
+    <h1>
+      <%= gravatar_for @user %>
+      <%= @user.account_id %>
+    </h1>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col text-center">
+    <h2>Greetings: <%= get_greeting @user %></h2>
+    <h2>Someone else greetings: <%= get_others_set_greeting @user %></h2>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col text-center gap-6">
+    <h3 class="p-3">Change your greetings here: </h3>
+
+    <%= form_with(model: @user, local: false, class: "p-3") do |f| %>
+      <%= f.label "Set your own greeting here:" %>
+      <%= f.text_field '', placeholder: 'message', id: "form_message" %>
+      <%= link_to "Submit", "javascript:set_greeting()", class: "btn btn-primary" %>
+    <% end %>
+
+    <%= form_with(model: @user, local: false, class: "p-3") do |f| %>
+      <%= f.label "Set someone else's greeting here:" %>
+      <%= f.text_field '', placeholder: 'message', id: "someone_message" %>
+      <%= link_to "Submit", "javascript:set_greeting_for_others('#{@user.account_id}')", class: "btn btn-secondary" %>
+    <% end %>
+
+    <h5 class="p-4">
+      The button doesn't freeze, but it's processing transaction. 
+      Haven't learnt how to freeze button yet though. Multiple clicks
+      will make multiple transactions (hence unsafe). 
+    </h5>
+    
+    <p>Ahem Ahem... if result not seen, try reload the page 
+    after set to see the result... Sorry for the inconvenience.</p>
+
+    <p>
+      If the message isn't correct, check window.walletConnection: most probably 
+      you haven't log out of the previous one before logging in to this one. 
+      Immediately logging in doesn't override window.walletConnection. 
+    </p>
+
+    <p>
+      The last error is RPC isn't working currently. You can see this if you open 
+      browser console and see "Retrying transaction ___ with a new nonce"... Until the
+      retry successful, you can reload the page thereafter. 
+    </p>
+  </div>
+</div>

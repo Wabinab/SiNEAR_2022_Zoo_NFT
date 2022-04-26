@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>GreeterNear</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="d-flex flex-column h-100">
+    <%= render 'layouts/header' %>
+
+    <div class="container pb-6">
+      <% flash.each do |message_type, message| %>
+        <%= content_tag(:div, message, class: "alert alert-#{message_type}") %>
+      <% end %>
+
+      <%= yield %>
+      <%= simple_format debug(params).to_yaml if Rails.env.development? %>  
+    </div>
+
+    <%= render 'layouts/footer' %>
+  </body>
+</html>
