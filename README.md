@@ -1,6 +1,13 @@
 # Spring is NEAR Challenge 6: Zoo NFT by NEAR Ukraine
 
-The first thing is to recreate master key and credentials. 
+The first thing is to bundle install stuff. We only want non production. 
+
+```
+bundle config set --local without production
+bundle install
+```
+
+The second thing is to recreate master key and credentials. 
 
 ```
 EDITOR="code ." bin/rails credentials:edit
