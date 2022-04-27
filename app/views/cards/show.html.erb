@@ -1,0 +1,71 @@
+<% define_constants %>
+<% @token_info = get_token_by_id @token_id %>
+<% @metadata = @token_info["metadata"] %>
+
+<div class="row">
+  <div class="col text-center">
+    <h1>
+      <%= @token_id %>
+    </h1>
+  </div>
+</div>
+
+<div class="row gap-3">
+  <div class="d-flex align-items-center justify-content-center">
+    <div class="card" style="width: 26rem;">
+      <%= image_tag(@metadata["media"]) %>
+      <div class="card-body">
+        <h4 class="card-title"><%= @metadata["title"] %></h4>
+        <p class="card-text"><%= @metadata["description"] %></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex align-items-center justify-content-center">
+    <div class="card" style="width: 26rem;">
+      <div class="card-body">
+        <h2 class="card-title text-center">All Owners</h2>
+
+        <p class="card-text">
+          <% @token_info["all_owners"].each do |k, v| %>
+            <li><strong><%= k %></strong>: <%= v.to_f / 100 %>%</li>
+          <% end %>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <a class="btn btn-primary btn-lg col-4 mx-auto"
+      data-bs-toggle="collapse" 
+      href="#collapseExample" 
+      role="button" 
+      aria-expanded="false" 
+      aria-controls="collapseExample"
+  >
+    Transfer
+  </a>
+
+  <div class="collapse" id="collapseExample">
+    <div class="d-flex align-items-center justify-content-center">
+        <%= form_with(model: @card, remote: true, data: { turbo: false }) do |f| %>
+          <%= f.label "Receiver-id:" %>
+          <%= f.text_field '', class: 'form-control', id: "receiver_id" %>
+
+          <%= f.hidden_field '', value: @token_id, id: "token_id" %>
+
+          <%= f.label "Percentage:" %>
+          <%= f.number_field '', in: 0.01..100.0, step: 0.01, class: 'form-control', id: "percentage" %>
+
+          <div class="p-3 text-center">
+            <%= link_to "Submit", "javascript:nft_transfer()", class: "btn btn-outline-success" %>
+          </div>
+
+          <p><strong>Please manually reload after transfer.</strong></p>
+          <p>If you type percentage value more than 100,<br> it would still work, but smart contract will panic.</p>
+        <% end %>
+    </div>
+  </div>
+</div>
+
+
+

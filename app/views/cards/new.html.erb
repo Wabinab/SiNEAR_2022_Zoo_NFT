@@ -1,0 +1,13 @@
+  <div class="row">
+    <div class="col">
+      <%= form_with(model: @card, remote: true, data: { turbo: false }) do |f| %>
+        <%= f.label "Title:" %>
+        <%= f.text_field '', class: 'form-control', id: "card_title" %>
+        <%= f.label "Description:" %>
+        <%= f.text_field '', class: 'form-control', id: "card_desc" %>
+        <%= f.label "Image URL:" %>
+        <%= f.text_field '', placeholder: 'direct img url', class: 'form-control', id: "card_img" %>
+        <%= link_to "Submit", "javascript:nft_mint('#{@token_id}')", class: "btn btn-success" %>
+      <% end %>
+    </div>
+  </div>
