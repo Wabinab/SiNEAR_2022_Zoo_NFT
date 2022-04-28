@@ -56,8 +56,6 @@ impl NonFungibleTokenCore for Contract {
           "Predecessor must be the token owner."
         );
 
-        // REDUNDANT CHECKS ABOVE. 
-
         // get next approval ID
         let approval_id: u64 = token.next_approval_id;
     

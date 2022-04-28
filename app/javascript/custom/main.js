@@ -26,37 +26,33 @@ function login() {
   window.walletConnection.requestSignIn(nearConfig.contractName)
 }
 
-
-function set_greeting() {
-  var message = document.getElementById("form_message").value;
-  window.contract.set_greeting({"message": message})
-  .then(
-    value => {
-      alert("Successful set_greeting for yourself.");
-      window.location.reload();
-    },
-    err => alert(err),
-  );
+function detect_path_name() {
+  if (window.walletConnection.isSignedIn()) {
+    // We don't have extra security login. If they login at browser, we assumed they have
+    // at least partial access to their account; so we log them in. 
+    window.location.replace(
+      window.location.pathname + '?account_id=' + window.walletConnection.getAccountId()
+    );
+  } else {
+    alert('Not signed in. Please login to your account.');
+  }
 }
 
 
-function set_greeting_for_others(target) {
-  var message = document.getElementById("someone_message").value;
-  window.contract.set_greeting_for_others({
-    "target": target,
-    "message": message
-  }).then(
-    value => {
-      alert("Successful called set_greeting_for_others.");
-      window.location.reload();
-    },
-    err => alert(err),
-  );
+function movie_ticket() {
+
+}
+
+
+function zoo_ticket() {
+
 }
 
 
 
-window.set_greeting = set_greeting
-window.set_greeting_for_others = set_greeting_for_others
+
+window.detect_path_name = detect_path_name
+window.movie_ticket = movie_ticket
+window.zoo_ticket = zoo_ticket
 window.logout = logout
 window.login = login
