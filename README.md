@@ -44,3 +44,9 @@ You need to create an NFT project which will aid in attracting funds that will b
 This challenge is a part of the “For Ukraine” hackathon by 🇺🇦near-ua . Your submission will be eligible for both NEAR Spring and “For Ukraine” bounties. More info here: https://eventornado.com/event/near-hackathon-for-ukraine/
 
 ---
+
+## Contract
+Mostly copied from [this link](https://github.com/near-examples/nft-tutorial), but add some missing functionality like `add_sale`, and `nft_transfer_payout`. 
+
+## References
+- https://github.com/near-examples/nft-tutorial
