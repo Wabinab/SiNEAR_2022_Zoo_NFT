@@ -4,7 +4,7 @@
 
 <div class="row">
   <div class="col text-center">
-    <h1>
+    <h1 class="text-break">
       <%= @token_id %>
     </h1>
   </div>
@@ -16,7 +16,7 @@
       <%= image_tag(@metadata["media"]) %>
       <div class="card-body">
         <h4 class="card-title"><%= @metadata["title"] %></h4>
-        <p class="card-text"><%= @metadata["description"] %></p>
+        <p class="card-text text-break"><%= @metadata["description"] %></p>
       </div>
     </div>
   </div>
@@ -24,11 +24,16 @@
   <div class="d-flex align-items-center justify-content-center">
     <div class="card" style="width: 26rem;">
       <div class="card-body">
-        <h2 class="card-title text-center">All Owners</h2>
+        <h1 class="card-title text-center">
+          Owner: <%= @token_info["owner_id"] %>
+        </h1>
+        <br>
+
+        <h2 class="card-subtitle">Currently shared with:</h2>
 
         <p class="card-text">
-          <% @token_info["all_owners"].each do |k, v| %>
-            <li><strong><%= k %></strong>: <%= v.to_f / 100 %>%</li>
+          <% @token_info["shared_owners"].each do |v| %>
+            <li><%= v %></li>
           <% end %>
         </p>
       </div>

@@ -1,19 +1,30 @@
-import { connect, Contract, keyStores, WalletConnection } from 'near-api-js';
+import { connect, Contract, keyStores, WalletConnection, utils } from 'near-api-js';
 import getConfig from './config.js';
 
 
-const nearConfig = getConfig('development', 'greeter.wabinab.testnet')
+const nearConfig = getConfig('development', 'zoo_marketplace.wabinab.testnet')
 const near = await connect(Object.assign({ deps: { keyStore: new keyStores.BrowserLocalStorageKeyStore() } }, nearConfig));
+
+const nearConfig2 = getConfig('development', 'zoo_nft.wabinab.testnet')
+const near2 = await connect(Object.assign({ deps: { keyStore: new keyStores.BrowserLocalStorageKeyStore() } }, nearConfig));
+
 
 window.nearConfig = nearConfig
 window.near = near
+
+window.nearConfig2 = nearConfig2
+window.near2 = near2
 
 window.walletConnection = new WalletConnection(near)
 
 window.accountId = window.walletConnection.getAccountId()
 
 window.contract = await new Contract(window.walletConnection.account(), nearConfig.contractName, {
-  changeMethods: ['set_greeting', 'set_greeting_for_others'],
+  changeMethods: ['pay_and_mint_unsafe'],
+})
+
+window.contract2 = await new Contract(window.walletConnection.account(), nearConfig2.contractName, {
+  changeMethods: ['nft_approve'],
 })
 
 
@@ -39,8 +50,36 @@ function detect_path_name() {
 }
 
 
-function movie_ticket() {
-
+function movie_ticket(token_id) {
+  window.contract.pay_and_mint_unsafe(
+    {
+      "nft_contract_id": "zoo_nft.wabinab.testnet",
+      "price": utils.format.parseNearAmount("1"),  // to be changed.
+      "nft_seller_id": "somebodyelse.testnet",  // to be changed.
+      "token_id": token_id,
+      "metadata": {
+        "title": "temp_title",
+        "description": "some_description",
+        "media": "https://www.google.com",
+        "issued_at": Math.floor(Date.now() / 1000)
+      },
+      "size": 4
+    },
+    "30000000000000",  // 30 TGas
+    utils.format.parseNearAmount("1.1")
+  ).then(
+    window.location.replace(
+      window.location.origin + "/cards/" + token_id
+    )
+  );
+  // ).then(
+  //   value => {
+  //     window.location.replace(
+  //       window.location.origin + "/cards/" + token_id
+  //     )
+  //   },
+  //   err => alert(err),
+  // );
 }
 
 

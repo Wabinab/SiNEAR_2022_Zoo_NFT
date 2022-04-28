@@ -1,5 +1,5 @@
 <div class="pt-5 pb-6 justify-content-center text-center">
   <h1>Movie Ticket Entrance</h1>
   <p>(Maybe put an image here)</p>
-  <%= link_to "Buy Movie Ticket", "javascript:movie_ticket()", class: "btn btn-success" %>
+  <%= link_to "Buy Movie Ticket", "javascript:movie_ticket('#{@token_id}')", class: "btn btn-success" %>
 </div>
