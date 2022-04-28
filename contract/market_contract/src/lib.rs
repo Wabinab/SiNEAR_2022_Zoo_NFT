@@ -1,18 +1,20 @@
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::collections::{LookupMap, UnorderedMap, UnorderedSet};
-use near_sdk::json_types::{U128, U64};
+use near_sdk::json_types::{U128, U64, Base64VecU8};
 use near_sdk::serde::{Deserialize, Serialize};
+use near_sdk::utils::{is_promise_success};
 use near_sdk::{
   require, assert_one_yocto, env, ext_contract, near_bindgen, AccountId, Balance,
-  Gas, PanicOnDefault, Promise, CryptoHash, BorshStorageKey,
+  Gas, PanicOnDefault, Promise, CryptoHash, BorshStorageKey, 
 };
 use std::collections::HashMap;
 
-use near_helper::{expect_lightweight, yoctonear_to_near};
+use near_helper::{expect_lightweight, near_to_yoctonear, yoctonear_to_near};
 
 use crate::external::*;
 use crate::internal::*;
 use crate::sale::*;
+use crate::metadata::*;
 use near_sdk::env::STORAGE_PRICE_PER_BYTE;
 
 mod external;
@@ -20,10 +22,13 @@ mod internal;
 mod nft_callbacks;
 mod sale;
 mod sale_views;
+mod metadata;
 
 // GAS constants
 const GAS_FOR_ROYALTIES: Gas = Gas(115_000_000_000_000);
 const GAS_FOR_NFT_TRANSFER: Gas = Gas(15_000_000_000_000);
+const GAS_FOR_CALLBACK_AND_MINTING: Gas = Gas(20_000_000_000_000);
+const GAS_FOR_MINTING: Gas = Gas(10_000_000_000_000);
 
 // attach 0 NEAR to call
 const NO_DEPOSIT: Balance = 0;

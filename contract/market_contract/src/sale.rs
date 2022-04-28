@@ -17,6 +17,100 @@ pub struct Sale {
 #[near_bindgen]
 impl Contract {
 
+    /// Buy an mint-on-demand nft
+    #[payable]
+    pub fn pay_and_mint(
+      &mut self,
+      nft_contract_id: AccountId,
+      price: U128,
+      nft_seller_id: AccountId,
+      token_id: TokenId,
+      metadata: TokenMetadata,
+      perpetual_royalties: Option<HashMap<AccountId, u16>>,
+      size: Option<usize>
+    ) {
+      require!(
+        env::attached_deposit() >= (u128::from(price) + near_to_yoctonear(0.1)),
+        concat!(
+          "You attached less than the amount needed to buy this NFT + storage deposit.",
+          "Storage reserve 0.1N will MOSTLY BE RETURNED."
+        )
+      );
+
+      require!(
+        env::attached_deposit() <= (u128::from(price) + near_to_yoctonear(0.101)),
+        "You attached too much near. This function requires EXACTLY price + 0.1N."
+      );
+
+      Promise::new(nft_seller_id).transfer(price.into()).then(
+        ext_self::on_nft_mint(
+          price,
+          nft_contract_id,
+
+          token_id,
+          metadata,
+          env::signer_account_id(),  // receiver of NFT is signer. 
+          perpetual_royalties,
+          size,
+          Some(env::signer_account_id()),  // refund_to_signer
+  
+          env::current_account_id(),
+          near_to_yoctonear(0.1),
+          GAS_FOR_CALLBACK_AND_MINTING
+        )
+      );
+      
+    }
+
+
+    /// Reduced gas method. In the future, we'll have a separate registration
+    /// of token_minting-specific-information separately, so we don't have to 
+    /// pass the variables around (which is the main cost of gas). These will 
+    /// be LookupMap<CopyId, TokenMetadata> where we can retrieve a copy/clone
+    /// of the metadata based on CopyId. 
+    #[payable]
+    pub fn pay_and_mint_unsafe(
+      &mut self,
+      nft_contract_id: AccountId,
+      price: U128,
+      nft_seller_id: AccountId,
+      token_id: TokenId,
+      metadata: TokenMetadata,
+      perpetual_royalties: Option<HashMap<AccountId, u16>>,
+      size: Option<usize>
+    ) {
+      require!(
+        env::attached_deposit() >= (u128::from(price) + near_to_yoctonear(0.1)),
+        concat!(
+          "You attached less than the amount needed to buy this NFT + storage deposit.",
+          "Storage reserve 0.1N will MOSTLY BE RETURNED."
+        )
+      );
+
+      require!(
+        env::attached_deposit() <= (u128::from(price) + near_to_yoctonear(0.101)),
+        "You attached too much near. This function requires EXACTLY price + 0.1N."
+      );
+
+      
+      Promise::new(nft_seller_id).transfer(price.into()).then(
+        // unsafe as mint irregardless of success or fail transfer money. 
+
+        ext_contract::nft_mint(
+          token_id,
+          metadata,
+          env::signer_account_id(),  // receiver of NFT is signer. 
+          perpetual_royalties,
+          size,
+          Some(env::signer_account_id()),  // refund_to_signer
+  
+          nft_contract_id,
+          near_to_yoctonear(0.1),
+          GAS_FOR_CALLBACK_AND_MINTING
+        )
+      );
+    }
+
     /// removes a sale from the market
     #[payable]
     pub fn remove_sale(
@@ -202,6 +296,39 @@ impl Contract {
 
       price  // return price being payed out. 
     }
+
+
+    #[private]
+    #[payable]
+    pub fn on_nft_mint(
+      &mut self,
+      payment_amount: U128,
+      nft_contract_id: AccountId,
+
+      token_id: TokenId,
+      metadata: TokenMetadata,
+      receiver_id: AccountId,
+      perpetual_royalties: Option<HashMap<AccountId, u16>>,
+      size: Option<usize>,
+      refund_to_signer: Option<AccountId>,
+    ) -> Promise {
+      if is_promise_success() {
+        ext_contract::nft_mint(
+          token_id,
+          metadata,
+          receiver_id,
+          perpetual_royalties,
+          size,
+          refund_to_signer,
+
+          nft_contract_id,
+          near_to_yoctonear(0.1),
+          GAS_FOR_MINTING
+        )
+      } else {
+        Promise::new(env::signer_account_id()).transfer(payment_amount.into())
+      }
+    }
 }
 
 // cross contract call that we call on our own contract. 
@@ -212,5 +339,18 @@ trait ExtSelf {
     &mut self,
     buyer_id: AccountId,
     price: U128,
+  ) -> Promise;
+
+  fn on_nft_mint(
+    &mut self,
+    payment_amount: U128,
+    nft_contract_id: AccountId,
+
+    token_id: TokenId,
+    metadata: TokenMetadata,
+    receiver_id: AccountId,
+    perpetual_royalties: Option<HashMap<AccountId, u16>>,
+    size: Option<usize>,
+    refund_to_signer: Option<AccountId>,
   ) -> Promise;
 }

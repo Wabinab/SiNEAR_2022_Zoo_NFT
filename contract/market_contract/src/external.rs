@@ -16,4 +16,14 @@ trait ExtContract {
       balance: U128,  // price by owner + royalty. 
       max_len_payout: u32,  // max amount of accounts market can payout at once. 
     );
+
+    fn nft_mint(
+      &mut self,
+      token_id: TokenId,
+      metadata: TokenMetadata,
+      receiver_id: AccountId,
+      perpetual_royalties: Option<HashMap<AccountId, u16>>,
+      size: Option<usize>,
+      refund_to_signer: Option<AccountId>,
+    );
 }

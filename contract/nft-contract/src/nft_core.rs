@@ -12,6 +12,7 @@ pub trait NonFungibleTokenCore {
       &mut self,
       token_id: TokenId,
       share_accounts: Vec<AccountId>,
+      refund_to_signer: Option<AccountId>,
     );
 
     //transfers an NFT to a receiver ID
@@ -96,6 +97,7 @@ impl NonFungibleTokenCore for Contract {
       &mut self,
       token_id: TokenId,
       share_accounts: Vec<AccountId>,
+      refund_to_signer: Option<AccountId>,
     ) {
       require!(
         env::attached_deposit() >= near_to_yoctonear(0.1),
@@ -154,7 +156,12 @@ impl NonFungibleTokenCore for Contract {
         // Might include in the future handling callbacks. 
       } else if new_bytes > old_bytes {
         let required_storage = new_bytes - old_bytes;
-        refund_deposit(required_storage);
+        if let Some(refund_to_signer) = refund_to_signer {
+          refund_deposit(required_storage, refund_to_signer);
+        } else {
+          refund_deposit(required_storage, env::predecessor_account_id());
+        }
+        
       }
 
       // else no changes, do nothing to storage. 

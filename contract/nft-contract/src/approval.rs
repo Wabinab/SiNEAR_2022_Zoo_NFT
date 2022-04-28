@@ -78,7 +78,7 @@ impl NonFungibleTokenCore for Contract {
         self.tokens_by_id.insert(&token_id, &token);
     
         // refund excess storage attached by user. If user didn't attach enough, panic. 
-        refund_deposit(storage_used);
+        refund_deposit(storage_used, env::predecessor_account_id());
 
         // if message passed in, we initiate cross contract call on account we're 
         // giving access to. 

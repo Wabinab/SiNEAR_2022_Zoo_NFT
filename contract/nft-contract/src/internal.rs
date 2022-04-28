@@ -72,7 +72,7 @@ pub(crate) fn refund_approved_account_ids(
 
 /// refund the initial deposit based on the amount of 
 /// storage that was used up
-pub(crate) fn refund_deposit(storage_used: u64) {
+pub(crate) fn refund_deposit(storage_used: u64, to_signer: AccountId) {
   let required_cost_to_store_info = env::storage_byte_cost() 
       * Balance::from(storage_used);  // move up if fail. 
 
@@ -89,7 +89,7 @@ pub(crate) fn refund_deposit(storage_used: u64) {
   // if refund is greater than 1 yoctoNEAR, 
   // refund the predecessor that amount. 
   if refund > 1 {
-    Promise::new(env::predecessor_account_id()).transfer(refund);
+      Promise::new(to_signer).transfer(refund);
   }
 }
 
