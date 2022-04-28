@@ -1,0 +1,41 @@
+
+<div class="bg-warning">
+  <h1 class="text-center">Zoo of Ukraine Needs your Help</h1>
+  <%= image_tag "https://images.unsplash.com/photo-1534567153574-2b12153a87f0?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80", 
+    class: "img-fluid" %>
+  <%= link_to "Source Image", "https://unsplash.com/photos/ttpNCevA1tA"  %>
+</div>
+
+
+<div class="bg-success bg-opacity-25">
+  <h3 class="text-center">Buy some tickets to support!</h3>
+
+  <div class="row align-items-start">
+    <div class="col-6 col-sm-6">
+      <%= image_tag "https://images.unsplash.com/photo-1473603477862-9d352d4615e1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1374&q=80",
+        class: "container-xl rounded float-start" %>
+    </div>
+
+    <div class="col-6 col-sm-6">
+      <h5>
+        Want to watch some zoo movies? Buy your ticket here!
+      </h5>
+      <%= link_to "Movie tickets", movie_ticket_url, class: "btn btn-success"  %>
+    </div>
+  </div>
+
+  <div class="row align-items-start">
+    <div class="col-6 col-sm-6">
+      <h5>
+        How about future entrance tickets? 
+      </h5>
+      <%= link_to "Movie tickets", future_ticket_url, class: "btn btn-success"  %>
+    </div>
+
+    <div class="col-6 col-sm-6">
+      <%= image_tag "https://images.unsplash.com/photo-1473603477862-9d352d4615e1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1374&q=80",
+        class: "container-xl rounded float-start" %>
+    </div>
+
+  </div>
+</div>
