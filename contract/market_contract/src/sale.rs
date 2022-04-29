@@ -99,10 +99,10 @@ impl Contract {
         "Cannot find template id. Ensure template_id is correct or created!"
       );
 
-      let mut minted = expect_lightweight(
-        self.minted.get(&template_id),
-        "Cannot find template id. Ensure template_id is correct or created!"
-      );
+      let mut minted = match self.minted.get(&template_id) {
+        Some(value) => value,
+        None => 0
+      };
 
       require!(
         minted <= max_num_of_mint,
@@ -169,10 +169,10 @@ impl Contract {
         "Cannot find template id. Ensure template_id is correct or created!"
       );
 
-      let mut minted = expect_lightweight(
-        self.minted.get(&template_id),
-        "Cannot find template id. Ensure template_id is correct or created!"
-      );
+      let mut minted = match self.minted.get(&template_id) {
+        Some(value) => value,
+        None => 0
+      };
 
       require!(
         minted <= max_num_of_mint,
