@@ -78,6 +78,7 @@ impl Contract {
       template_id: String,
       price: U128,
       token_id: TokenId,
+      // issued_at include in the future. 
       perpetual_royalties: Option<HashMap<AccountId, u16>>,  // temporarily. 
     ) {
       require!(
@@ -147,6 +148,7 @@ impl Contract {
       template_id: String,
       price: U128,
       token_id: TokenId,
+      issued_at: Option<u64>,
       perpetual_royalties: Option<HashMap<AccountId, u16>>,  // temporarily. 
     ) {
       require!(
@@ -185,10 +187,13 @@ impl Contract {
         "Cannot find template owner. Ensure template_id is correct or created!"
       );
 
-      let metadata = expect_lightweight(
+      let mut metadata = expect_lightweight(
         self.template_metadata.get(&template_id),
         "Cannot find template metadata. Ensure template_id is correct or created!"
       );
+
+      metadata.issued_at = issued_at;
+      metadata.copies = Some(minted);
 
       let size = self.nft_size.get(&template_id);
       
@@ -411,15 +416,12 @@ impl Contract {
     ) -> Promise {
       if is_promise_success() {
   
-        let nft_seller_id = expect_lightweight(
-          self.template_owner.get(&template_id),
-          "Cannot find template owner. Ensure template_id is correct or created!"
-        );
-  
         let metadata = expect_lightweight(
           self.template_metadata.get(&template_id),
           "Cannot find template metadata. Ensure template_id is correct or created!"
         );
+
+        // add issued at and mint in the future. 
   
         let size = self.nft_size.get(&template_id);
 
