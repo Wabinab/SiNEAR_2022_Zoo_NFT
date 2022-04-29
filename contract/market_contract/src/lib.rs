@@ -1,18 +1,20 @@
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::collections::{LookupMap, UnorderedMap, UnorderedSet};
-use near_sdk::json_types::{U128, U64};
+use near_sdk::json_types::{U128, U64, Base64VecU8};
 use near_sdk::serde::{Deserialize, Serialize};
+use near_sdk::utils::{is_promise_success};
 use near_sdk::{
   require, assert_one_yocto, env, ext_contract, near_bindgen, AccountId, Balance,
-  Gas, PanicOnDefault, Promise, CryptoHash, BorshStorageKey,
+  Gas, PanicOnDefault, Promise, CryptoHash, BorshStorageKey, 
 };
 use std::collections::HashMap;
 
-use near_helper::{expect_lightweight, yoctonear_to_near};
+use near_helper::{expect_lightweight, near_to_yoctonear, yoctonear_to_near};
 
 use crate::external::*;
 use crate::internal::*;
 use crate::sale::*;
+use crate::metadata::*;
 use near_sdk::env::STORAGE_PRICE_PER_BYTE;
 
 mod external;
@@ -20,10 +22,13 @@ mod internal;
 mod nft_callbacks;
 mod sale;
 mod sale_views;
+mod metadata;
 
 // GAS constants
 const GAS_FOR_ROYALTIES: Gas = Gas(115_000_000_000_000);
 const GAS_FOR_NFT_TRANSFER: Gas = Gas(15_000_000_000_000);
+const GAS_FOR_CALLBACK_AND_MINTING: Gas = Gas(20_000_000_000_000);
+const GAS_FOR_MINTING: Gas = Gas(10_000_000_000_000);
 
 // attach 0 NEAR to call
 const NO_DEPOSIT: Balance = 0;
@@ -65,6 +70,21 @@ pub struct Contract {
 
     // keep track of storage that accounts payed. 
     pub storage_deposits: LookupMap<AccountId, Balance>,
+
+    /// Owner of this template
+    pub template_owner: LookupMap<String, AccountId>,
+
+    /// define the templates
+    pub template_metadata: LookupMap<String, TokenMetadata>,
+
+    /// define template max mint size 
+    pub max_mint: LookupMap<String, u64>,
+
+    /// minted amount
+    pub minted: LookupMap<String, u64>,
+
+    /// will be deprecated: size of nft
+    pub nft_size: LookupMap<String, usize>,
 }
 
 
@@ -80,6 +100,11 @@ pub enum StorageKey {
     ByNFTTokenTypeInner { token_type_hash: CryptoHash },
     FTTokenIds,
     StorageDeposits,
+    TemplateOwner,
+    TokenTemplates,
+    TemplateSize,
+    Minted,
+    NFTSize
 }
 
 
@@ -93,6 +118,11 @@ impl Contract {
         by_owner_id: LookupMap::new(StorageKey::ByOwnerId),
         by_nft_contract_id: LookupMap::new(StorageKey::ByNFTContractId),
         storage_deposits: LookupMap::new(StorageKey::StorageDeposits),
+        template_owner: LookupMap::new(StorageKey::TemplateOwner),
+        template_metadata: LookupMap::new(StorageKey::TokenTemplates),
+        max_mint: LookupMap::new(StorageKey::TemplateSize),
+        minted: LookupMap::new(StorageKey::Minted),
+        nft_size: LookupMap::new(StorageKey::NFTSize),
       }
     }
 

@@ -72,25 +72,45 @@ pub(crate) fn refund_approved_account_ids(
 
 /// refund the initial deposit based on the amount of 
 /// storage that was used up
-pub(crate) fn refund_deposit(storage_used: u64) {
-  let required_cost_to_store_info = env::storage_byte_cost() 
-      * Balance::from(storage_used);  // move up if fail. 
+pub(crate) fn refund_deposit(storage_used: u64, to_signer: AccountId) {
+    let required_cost_to_store_info = env::storage_byte_cost() 
+        * Balance::from(storage_used);  // move up if fail. 
 
-  let attached_deposit = env::attached_deposit();
+    let attached_deposit = env::attached_deposit();
 
-  require!(  // use assert or if and env::panic if fail. 
-    required_cost_to_store_info <= attached_deposit,
-    format!("Must attach {} yoctoNEAR to cover storage",
-      required_cost_to_store_info),
-  );
+    require!(  // use assert or if and env::panic if fail. 
+      required_cost_to_store_info <= attached_deposit,
+      format!("Must attach {} yoctoNEAR to cover storage",
+        required_cost_to_store_info),
+    );
 
-  let refund = attached_deposit - required_cost_to_store_info;
+    let refund = attached_deposit - required_cost_to_store_info;
 
-  // if refund is greater than 1 yoctoNEAR, 
-  // refund the predecessor that amount. 
-  if refund > 1 {
-    Promise::new(env::predecessor_account_id()).transfer(refund);
-  }
+    // if refund is greater than 1 yoctoNEAR, 
+    // refund the predecessor that amount. 
+    if refund > 1 {
+        Promise::new(to_signer).transfer(refund);
+    }
+}
+
+
+pub(crate) fn refund_storage_freed(storage_freed: u64, to_signer: AccountId) {
+    let required_cost_to_store_info = env::storage_byte_cost() 
+        * Balance::from(storage_freed);  // move up if fail. 
+
+    let attached_deposit = env::attached_deposit();
+
+    require!(  // use assert or if and env::panic if fail. 
+      required_cost_to_store_info <= attached_deposit,
+      format!("Must attach {} yoctoNEAR to cover storage",
+        required_cost_to_store_info),
+    );
+
+    let refund = attached_deposit + required_cost_to_store_info;
+
+    if refund > 1 {
+      Promise::new(to_signer).transfer(refund);
+    }
 }
 
 

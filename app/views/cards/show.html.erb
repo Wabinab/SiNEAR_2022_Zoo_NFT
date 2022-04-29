@@ -1,0 +1,92 @@
+<% define_constants %>
+<% @token_info = get_token_by_id @token_id %>
+<% @metadata = @token_info["metadata"] %>
+<% @share_len = @token_info["shared_owners"].length %>
+
+<div class="row">
+  <div class="col text-center">
+    <h1 class="text-break">
+      <%= @token_id %>
+    </h1>
+  </div>
+</div>
+
+<div class="row gap-3">
+  <div class="d-flex align-items-center justify-content-center">
+    <div class="card" style="width: 26rem;">
+      <%= image_tag(@metadata["media"]) %>
+      <div class="card-body">
+        <h4 class="card-title"><%= @metadata["title"] %></h4>
+        <p class="card-text text-break"><%= @metadata["description"] %></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex align-items-center justify-content-center">
+    <div class="card" style="width: 26rem;">
+      <div class="card-body">
+        <h1 class="card-title text-center">
+          Owner: <%= @token_info["owner_id"] %>
+        </h1>
+        <br>
+
+        <h2 class="card-subtitle">Currently shared with:</h2>
+
+        <%# If is owner %>
+        <div data-controller="cardform" 
+            data-cardform-current-value="<%= @token_info['owner_id'] %>"
+            data-cardform-length-value="<%= @share_len %>"
+        >
+          <div data-cardform-target="owner">
+            <p class="card-text">
+              <% @token_info["shared_owners"].each_with_index do |v, i| %>
+                <%= form_with(model: @cards, remote: true, data: { turbo: false }) do |f| %>
+                  <p>
+                    <%= f.text_field '', value: v, class: 'form-control', id: "owner_#{i}" %>
+                  </p>
+                <% end %>
+              <% end %>
+
+              <%= form_with(model: @cards, remote: true, data: { turbo: false}) do |f| %>
+                <%= f.hidden_field '', value: params[:token_id], id: "token_id_card" %>
+              <% end %>
+
+              <div class="p-3 text-center">
+                <%= link_to "Share With", 
+                    "javascript:share_with('#{@share_len}')", 
+                    class: "btn btn-outline-success #{cards_to_disable @share_len}" %>
+              </div>
+
+              <p>Note: Will ask for 0.1 N for storage; and refund the rest, everytime you change.</p>
+              <p>Can refund more than 0.1N if you use less storage than originally use. </p>
+            </p>
+          </div>
+
+          <%# If not owner %>
+          <%# Not the best because repeating stuffs; but oh well, easier to read. %>
+          <div data-cardform-target="sharer">
+            <p class="card-text">
+              <ul class="list-group">
+                <% @token_info["shared_owners"].each do |v| %>
+                  <li class="list-group-item"><%= v %></li>
+                <% end %>
+              </ul>
+            </p>
+          </div>
+
+          <%# If cannot share with anyone %>
+          <div data-cardform-target="noone">
+            <p class="card-text">No one</p>
+          </div>
+        </div>
+
+        
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+

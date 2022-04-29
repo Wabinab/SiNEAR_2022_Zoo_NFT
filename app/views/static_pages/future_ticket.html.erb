@@ -1,0 +1,29 @@
+<% define_constants %>
+<% @template_id = "entrance_tickets" %>
+<% @image_url = "https://ipfs.io/ipfs/bafybeidg3wc4wzjctlniabiyu32q6vw5rf23zx6u5djll45t3jtco7hshe/jay-wennington-s-fD5Tpew2k-unsplash.jpg" %>
+
+<div class="row gap-3 pt-5 pb-6 text-center">
+  <h1>Future Zoo Entrance Tickets for Sale</h1>
+
+  <div class="d-flex align-items-center justify-content-center">
+    <div class="card" style="width: 18rem;">
+      <%= image_tag @image_url, class: "card-img-top" %>
+      <div class="card-body">
+        <h3 class="card-title">Zoo Ticket for 1</h3>
+        <h5 class="card-subtitle">3.5 NEAR</h5>
+        <p class="card-text">
+          For single person only.
+        </p>
+      </div>
+    </div>
+  </div>
+  
+  
+  <%= link_to "Buy Future Entrance Ticket", "javascript:zoo_ticket('#{@token_id}')", 
+      class: "btn btn-success #{to_disable(@template_id)}" %>
+
+  <p class="text-center">
+    Numbers minted: 
+    <%= get_tickets_left @template_id %> / <%= get_total_tickets @template_id %>
+  </p>
+</div>

@@ -11,6 +11,7 @@ impl Contract {
         receiver_id: AccountId,
         perpetual_royalties: Option<HashMap<AccountId, u16>>,
         size: Option<usize>,
+        refund_to_signer: Option<AccountId>,
     ) {
       // measure the initial storage being used on contract.
         let initial_storage_usage = env::storage_usage();
@@ -79,6 +80,11 @@ impl Contract {
 
         // refund excess storage if user attached too much. 
         // Panic if they didn't attach enough. 
-        refund_deposit(required_storage_in_bytes);
+        if let Some(refund_to_signer) = refund_to_signer {
+          refund_deposit(required_storage_in_bytes, refund_to_signer);
+        } else {
+          refund_deposit(required_storage_in_bytes, env::predecessor_account_id());
+        }
+        
     }
 }

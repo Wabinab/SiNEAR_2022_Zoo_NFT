@@ -1,56 +1,104 @@
 <% define_constants %>
 
-<div class="row">
-  <div class="col text-center">
-    <h1>
-      <%= gravatar_for @user %>
-      <%= @user.account_id %>
-    </h1>
+<div class="container-md bg-secondary bg-opacity-25">
+  <div class="row pt-3 pb-3">
+    <div class="col text-center">
+      <h1>
+        <%= gravatar_for @user %>
+        <%= @user.account_id %>
+      </h1>
+    </div>
   </div>
 </div>
 
-<div class="row">
-  <div class="col text-center">
-    <h2>Greetings: <%= get_greeting @user %></h2>
-    <h2>Someone else greetings: <%= get_others_set_greeting @user %></h2>
+<div class="container-md pb-6 pt-3">
+  <ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="inventory-tab" data-bs-toggle="tab" 
+          data-bs-target="#inventory" type="button" role="tab" aria-controls="inventory" 
+          aria-selected="true">Inventory</button>
+    </li>
+
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="listings-tab" data-bs-toggle="tab" 
+      data-bs-target="#listings" type="button" role="tab" aria-controls="listings" 
+      aria-selected="false">Listings</button>
+    </li>
+  </ul>
+
+
+  <div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="inventory" 
+        role="tabpanel" aria-labelledby="inventory-tab"
+    >
+      <% @tokens = get_tokens @user.account_id %>
+
+      <div class="d-flex flex-row gap-3 flex-wrap">
+        <% @tokens.each do |t| %>
+          <% @metadata = t["metadata"] %>
+
+          <%= link_to("/cards/" + t["token_id"], class: "no_link") do %>
+            <div class="card" style="width: 15rem;">
+              <%# style: "object-fit: cover;" for not squashed image. %>
+              <%= image_tag @metadata["media"], class: "card-img-top", style: "height: 15vw;" %>
+              <div class="card-body">
+                <h4 class="card-title"><%= @metadata["title"] %></h4>
+                <h5 class="card-text"><%= truncate(@metadata["description"], :length => 100) %></h5>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+
+      
+    </div>
+
+    <div class="tab-pane fade" id="listings" role="tabpanel" 
+      aria-labelledby="listings-tab"
+    >
+      <p>
+        This is the listing tab to sell stuffs. Just to show off, we're including 
+        what the shop owner see here so you can try yourself. Unfortunately, 
+        what you tried can't be listed to others, because the movie tickets and
+        zoo entrance tickets are hardcoded currently. In the future, owners and 
+        users will have different interface. We combined them due to insufficient
+        time. Template generation also needs refactoring and upgrading for better 
+        user experience. 
+      </p>
+      <br>
+      <hr>
+      
+      <h2 class="text-center">Define Template</h2>
+      <%= form_with(model: @cards, remote: true, data: { turbo: false }) do |f| %>
+        <%= f.label "Title:" %>
+        <%= f.text_field '', class: 'form-control', id: 'template_title' %>
+
+        <%= f.label "Description:" %>
+        <%= f.text_field '', class: 'form-control', id: 'template_desc' %>
+
+        <%= f.label "Image URL:" %>
+        <%= f.text_field '', class: 'form-control', id: 'card_img' %>
+
+        <%= f.label "Can be share with __ person:" %>
+        <%= f.number_field '', step: 1, class:'form-control', id: 'size' %>
+
+        <%= f.label "Template ID" %>
+        <%= f.text_field '', class: 'form-control', id: 'template_id' %>
+
+        <%= f.label "Max number of this NFT" %>
+        <%= f.number_field '', step: 1, class: 'form-control', id: 'max_num_of_mint' %>
+
+        <div class="pt-3 d-flex justify-content-center align-items-center">
+          <%= link_to "Generate Template", "javascript:generate_template()", 
+              class: "btn btn-success" %>
+        </div>
+      <% end %>
+    </div>
   </div>
 </div>
 
-<div class="row">
-  <div class="col text-center gap-6">
-    <h3 class="p-3">Change your greetings here: </h3>
 
-    <%= form_with(model: @user, local: false, class: "p-3") do |f| %>
-      <%= f.label "Set your own greeting here:" %>
-      <%= f.text_field '', placeholder: 'message', id: "form_message" %>
-      <%= link_to "Submit", "javascript:set_greeting()", class: "btn btn-primary" %>
-    <% end %>
 
-    <%= form_with(model: @user, local: false, class: "p-3") do |f| %>
-      <%= f.label "Set someone else's greeting here:" %>
-      <%= f.text_field '', placeholder: 'message', id: "someone_message" %>
-      <%= link_to "Submit", "javascript:set_greeting_for_others('#{@user.account_id}')", class: "btn btn-secondary" %>
-    <% end %>
 
-    <h5 class="p-4">
-      The button doesn't freeze, but it's processing transaction. 
-      Haven't learnt how to freeze button yet though. Multiple clicks
-      will make multiple transactions (hence unsafe). 
-    </h5>
-    
-    <p>Ahem Ahem... if result not seen, try reload the page 
-    after set to see the result... Sorry for the inconvenience.</p>
 
-    <p>
-      If the message isn't correct, check window.walletConnection: most probably 
-      you haven't log out of the previous one before logging in to this one. 
-      Immediately logging in doesn't override window.walletConnection. 
-    </p>
 
-    <p>
-      The last error is RPC isn't working currently. You can see this if you open 
-      browser console and see "Retrying transaction ___ with a new nonce"... Until the
-      retry successful, you can reload the page thereafter. 
-    </p>
-  </div>
-</div>

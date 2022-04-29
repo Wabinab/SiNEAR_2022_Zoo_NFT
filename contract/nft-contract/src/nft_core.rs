@@ -12,6 +12,7 @@ pub trait NonFungibleTokenCore {
       &mut self,
       token_id: TokenId,
       share_accounts: Vec<AccountId>,
+      refund_to_signer: Option<AccountId>,
     );
 
     //transfers an NFT to a receiver ID
@@ -91,11 +92,14 @@ impl NonFungibleTokenCore for Contract {
 
     /// Set accounts. 
     /// Payable to pay for storage; but limit how much deposit user can attach. 
+    /// Dang... this is REALLY REALLY MESSY as it's a "rubbish draft." I hate this
+    /// quite.... if we're to continue on, this requires REFACTORING!!!
     #[payable]
     fn set_accounts(
       &mut self,
       token_id: TokenId,
       share_accounts: Vec<AccountId>,
+      refund_to_signer: Option<AccountId>,
     ) {
       require!(
         env::attached_deposit() >= near_to_yoctonear(0.1),
@@ -128,6 +132,8 @@ impl NonFungibleTokenCore for Contract {
         )
       );
 
+      let mut total_storage = 0i64;
+
       // If we were to implement iterator like this: 
       // approved_account_ids.map(bytes_for_approved_account_id).sum();
       // it needs the iterator trait; One is too lazy to fight the compiler,
@@ -145,22 +151,49 @@ impl NonFungibleTokenCore for Contract {
         new_bytes += bytes_for_approved_account_id(account_id);
       }
 
-      if old_bytes > new_bytes {
-        let refund_bytes = old_bytes - new_bytes;
-        let _ = refund_storage_to_owner(
-          token.owner_id, 
-          refund_bytes
-        );  // we didn't have callbacks in case refund fails, for simplicity. 
-        // Might include in the future handling callbacks. 
-      } else if new_bytes > old_bytes {
-        let required_storage = new_bytes - old_bytes;
-        refund_deposit(required_storage);
-      }
+      total_storage += new_bytes as i64 - old_bytes as i64;
+      
 
-      // else no changes, do nothing to storage. 
+      // we don't need the refund above; can just use this at the beginning lol... 
+      let partial_storage_usage = env::storage_usage();
       
       // Change the values after sorting out the storage
       self.share_nfts.insert(&token_id, &share_accounts);
+
+      // Then we need to display them inside wallet. 
+      let old_owner_set: HashSet<AccountId> = old_share_accounts.into_iter().collect();
+      let new_owner_set: HashSet<AccountId> = share_accounts.into_iter().collect();
+
+      // remove owner from old set
+      for account_id in old_owner_set.difference(&new_owner_set) {
+        if account_id != &token.owner_id {
+          self.internal_remove_token_from_owner(account_id, &token_id);
+        }
+      }
+
+      // add owner to new set
+      for account_id in new_owner_set.difference(&old_owner_set) {
+        if account_id != &token.owner_id {
+          self.internal_add_token_to_owner(account_id, &token_id);
+        }
+      }
+
+      let current_storage = env::storage_usage();
+      total_storage += current_storage as i64 - partial_storage_usage as i64;
+
+      let refund_target = match refund_to_signer {
+        Some(value) => value, 
+        None => env::predecessor_account_id()
+      };
+
+      if total_storage < 0 {
+        // new storage usage is less than before. 
+        refund_storage_freed(total_storage.abs() as u64, refund_target);
+      } else if total_storage > 0 {
+        refund_deposit(total_storage as u64, refund_target);
+      } else {
+        Promise::new(refund_target).transfer(env::attached_deposit());
+      }
 
       // Ok, I think that's done? Anything I missed out? 
     }

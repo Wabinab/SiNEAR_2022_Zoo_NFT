@@ -12,6 +12,8 @@ use near_helper::{
   expect_lightweight, near_to_yoctonear
 };
 
+use std::collections::HashSet;
+
 use crate::internal::*;
 pub use crate::metadata::*;
 pub use crate::mint::*;

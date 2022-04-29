@@ -1,0 +1,29 @@
+<% define_constants %>
+<% @template_id = "movie_tickets" %>
+<% @image_url = "https://ipfs.io/ipfs/bafybeia6reket35545vhppdlomv6rhioszivifyjxsl2w6okkszloyln6e/Movie_Tickets.jpeg" %>
+
+<div class="row gap-3 pt-5 pb-6 text-center">
+  <h1>Movie Ticket For Sale</h1>
+
+  <div class="d-flex align-items-center justify-content-center">
+    <div class="card" style="width: 18rem;">
+      <%= image_tag @image_url, class: "card-img-top" %>
+      <div class="card-body">
+        <h3 class="card-title">Movie ticket for 4</h3>
+        <h5 class="card-subtitle">1 NEAR</h5>
+        <p class="card-text">
+          Can share within a family
+        </p>
+      </div>
+    </div>
+  </div>
+  
+  
+  <%= link_to "Buy Movie Ticket", "javascript:movie_ticket('#{@token_id}')", 
+      class: "btn btn-success #{to_disable(@template_id)}" %>
+
+  <p class="text-center">
+    Numbers minted: 
+    <%= get_tickets_left @template_id %> / <%= get_total_tickets @template_id %>
+  </p>
+</div>
