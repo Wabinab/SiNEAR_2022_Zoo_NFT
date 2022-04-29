@@ -19,6 +19,7 @@
   <%= link_to "Buy Movie Ticket", "javascript:movie_ticket('#{@token_id}')", class: "btn btn-success" %>
 
   <p class="text-center">
-    Numbers left: <%= get_movie_tickets_left %>
+    Numbers minted: 
+    <%= get_tickets_left "movie_tickets" %> / <%= get_total_tickets "movie_ticket" %>
   </p>
 </div>

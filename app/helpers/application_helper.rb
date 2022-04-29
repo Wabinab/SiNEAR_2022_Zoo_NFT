@@ -4,7 +4,7 @@ module ApplicationHelper
     @conf = NearApi::Config.new(node_url: @node_url)
     @query = NearApi::Query.new(config = @conf)
 
-    @contract = 'greeter.wabinab.testnet'
+    @contract = 'zoo_marketplace.wabinab.testnet'
     @contract2 = 'zoo_nft.wabinab.testnet'
   end
 end
