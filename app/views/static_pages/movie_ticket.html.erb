@@ -1,3 +1,4 @@
+<% define_constants %>
 <% @image_url = "https://ipfs.io/ipfs/bafybeia6reket35545vhppdlomv6rhioszivifyjxsl2w6okkszloyln6e/Movie_Tickets.jpeg" %>
 
 <div class="row gap-3 pt-5 pb-6 text-center">
@@ -16,4 +17,8 @@
   </div>
   
   <%= link_to "Buy Movie Ticket", "javascript:movie_ticket('#{@token_id}')", class: "btn btn-success" %>
+
+  <p class="text-center">
+    Numbers left: <%= get_movie_tickets_left %>
+  </p>
 </div>

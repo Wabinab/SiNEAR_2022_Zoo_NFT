@@ -88,13 +88,13 @@ function generate_template() {
       {
         "template_owner": window.walletConnection.getAccountId(),
         "template_id": template_id,
-        "max_num_of_mint": max_num_of_mint,
+        "max_num_of_mint": parseInt(max_num_of_mint),
         "metadata": {
           "title": title,
           "description": description,
           "media": media,
         },
-        "size": size,
+        "size": parseInt(size),
       },
       "30000000000000", // 30 TGas
       utils.format.parseNearAmount("0.1")
