@@ -20,10 +20,10 @@ window.walletConnection = new WalletConnection(near)
 window.accountId = window.walletConnection.getAccountId()
 
 window.contract = await new Contract(window.walletConnection.account(), nearConfig.contractName, {
-  changeMethods: ['pay_and_mint_unsafe'],
+  changeMethods: ['pay_and_mint_unsafe', 'generate_template'],
 })
 
-window.contract2 = await new Contract(window.walletConnection.account(), nearConfig2.contractName, {
+window.contract_nft = await new Contract(window.walletConnection.account(), nearConfig2.contractName, {
   changeMethods: ['nft_approve'],
 })
 
@@ -55,15 +55,8 @@ function movie_ticket(token_id) {
     {
       "nft_contract_id": "zoo_nft.wabinab.testnet",
       "price": utils.format.parseNearAmount("1"),  // to be changed.
-      "nft_seller_id": "somebodyelse.testnet",  // to be changed.
       "token_id": token_id,
-      "metadata": {
-        "title": "Zoo Movie Tickets for 4",
-        "description": "Family ticket / friends ticket: 4 person",
-        "media": "https://ipfs.io/ipfs/bafybeia6reket35545vhppdlomv6rhioszivifyjxsl2w6okkszloyln6e/Movie_Tickets.jpeg",
-        "issued_at": Math.floor(Date.now() / 1000)
-      },
-      "size": 4
+      "issued_at": Math.floor(Date.now() / 1000),
     },
     "30000000000000",  // 30 TGas
     utils.format.parseNearAmount("1.1")
@@ -72,14 +65,6 @@ function movie_ticket(token_id) {
       window.location.origin + "/cards/" + token_id
     )
   );
-  // ).then(
-  //   value => {
-  //     window.location.replace(
-  //       window.location.origin + "/cards/" + token_id
-  //     )
-  //   },
-  //   err => alert(err),
-  // );
 }
 
 
@@ -88,10 +73,33 @@ function zoo_ticket() {
 }
 
 
+function generate_template() {
+    window.contract.generate_template(
+      {
+        "template_owner": window.walletConnection.getAccountId(),
+        "template_id": template_id,
+        "max_num_of_mint": max_num_of_mint,
+        "metadata": {
+          "title": title,
+          "description": description,
+          "media": media,
+        },
+        "size": size,
+      },
+      "30000000000000", // 30 TGas
+      utils.format.parseNearAmount("0.1")
+    ).then(
+      window.location.reload()
+    );
+}
+
+
+
 
 
 window.detect_path_name = detect_path_name
 window.movie_ticket = movie_ticket
 window.zoo_ticket = zoo_ticket
+window.generate_template = generate_template
 window.logout = logout
 window.login = login
