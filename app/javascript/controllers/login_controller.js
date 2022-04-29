@@ -34,9 +34,12 @@ export default class extends Controller {
   }
 
   showCurrentName() {
+    const account_id = window.walletConnection.getAccountId()
+
     this.nameTargets.forEach((element, _index) => {
       element.hidden = !this.currentValue
-      element.innerText = window.walletConnection.getAccountId()
+      element.innerText = account_id
+      element.href = "/users/" + account_id.replaceAll('.', '-');
     })
   }
 }

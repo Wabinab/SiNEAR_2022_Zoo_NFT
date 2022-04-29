@@ -31,13 +31,59 @@
     <div class="tab-pane fade show active" id="inventory" 
         role="tabpanel" aria-labelledby="inventory-tab"
     >
-      This is the inventory tab. Contains all current NFTs (excluding the ones currently listed). 
+      <% @tokens = get_tokens @user.account_id %>
+
+      <div class="d-flex flex-row gap-3 flex-wrap">
+        <% @tokens.each do |t| %>
+          <% @metadata = t["metadata"] %>
+
+          <%= link_to("/cards/" + t["token_id"], class: "no_link") do %>
+            <div class="card" style="width: 15rem;">
+              <%# style: "object-fit: cover;" for not squashed image. %>
+              <%= image_tag @metadata["media"], class: "card-img-top", style: "height: 15vw;" %>
+              <div class="card-body">
+                <h4 class="card-title"><%= @metadata["title"] %></h4>
+                <h5 class="card-text"><%= truncate(@metadata["description"], :length => 100) %></h5>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+
+      
     </div>
 
     <div class="tab-pane fade" id="listings" role="tabpanel" 
       aria-labelledby="listings-tab"
     >
-      This is the listing tabs. All things currently selling. 
+      <p>
+        This is the listing tab to sell stuffs. Just to show off, we're including 
+        what the shop owner see here so you can try yourself. Unfortunately, 
+        what you tried can't be listed to others, because the movie tickets and
+        zoo entrance tickets are hardcoded currently. In the future, owners and 
+        users will have different interface. We combined them due to insufficient
+        time. Template generation also needs refactoring and upgrading for better 
+        user experience. 
+      </p>
+      <br>
+      <hr>
+      
+      <h2 class="text-center">Define Template</h2>
+      <%= form_with(model: @cards, remote: true, data: { turbo: false }) do |f| %>
+        <%= f.label "Title:" %>
+        <%= f.text_field '', class: 'form-control', id: 'template_title' %>
+
+        <%= f.label "Description:" %>
+        <%= f.text_field '', class: 'form-control', id: 'template_desc' %>
+
+        <%= f.label "Image URL:" %>
+        <%= f.text_field '', class: 'form-control', id: 'card_img' %>
+
+        <div class="pt-3 d-flex justify-content-center align-items-center">
+          <%= link_to "Generate Template", "javascript:generate_template()", 
+              class: "btn btn-success" %>
+        </div>
+      <% end %>
     </div>
   </div>
 </div>

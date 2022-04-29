@@ -58,9 +58,9 @@ function movie_ticket(token_id) {
       "nft_seller_id": "somebodyelse.testnet",  // to be changed.
       "token_id": token_id,
       "metadata": {
-        "title": "temp_title",
-        "description": "some_description",
-        "media": "https://www.google.com",
+        "title": "Zoo Movie Tickets for 4",
+        "description": "Family ticket / friends ticket: 4 person",
+        "media": "https://ipfs.io/ipfs/bafybeia6reket35545vhppdlomv6rhioszivifyjxsl2w6okkszloyln6e/Movie_Tickets.jpeg",
         "issued_at": Math.floor(Date.now() / 1000)
       },
       "size": 4
