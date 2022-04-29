@@ -17,17 +17,68 @@ pub struct Sale {
 #[near_bindgen]
 impl Contract {
 
+    /// Generate Template
+    /// Just for you to try out, we did not assert only
+    /// shop owner could call this function. 
+    #[payable]
+    pub fn generate_template(
+      &mut self,
+      template_owner: AccountId,
+      template_id: String,
+      max_num_of_mint: u64,
+      metadata: TokenMetadata,
+      perpetual_royalties: Option<HashMap<AccountId, u16>>,
+      size: Option<usize>
+    ) {
+      let initial_storage_usage = env::storage_usage();
+
+      require!(
+        env::attached_deposit() >= near_to_yoctonear(0.1),
+        "Please attach exactly 0.1 NEAR for storage. Extra will be refunded."
+      );
+
+      require!(
+        env::attached_deposit() <= near_to_yoctonear(0.101),
+        "Please attach exactly 0.1 NEAR for storage. Extra will be refunded."
+      );
+
+      // Actually may have to check whether template exist same. 
+      // But one isn't sure how to do that without using much Gas + CPU,
+      // so we'll check only the template_id exists. 
+      if let Some(_template_id) = self.template_metadata.get(&template_id) {
+        env::panic_str(concat!(
+          "Template ID exists. Perhaps you already created a similar one? ",
+          "If not, use another template_id."
+        ));
+      } else {
+        self.template_owner.insert(&template_id, &template_owner);
+        self.template_metadata.insert(&template_id, &metadata);
+        self.max_mint.insert(&template_id, &max_num_of_mint);
+
+        // Actually size should be with metadata, we haven't got time to refactor
+        // that yet. This will be redundant. 
+        if let Some(size) = size {
+          self.nft_size.insert(&template_id, &size);
+        }
+
+        // And we'll totally ignore perpetual royalties for now. 
+      }
+
+      let required_storage_in_bytes = env::storage_usage() - initial_storage_usage;
+
+      self.refund_deposit(required_storage_in_bytes, env::predecessor_account_id());
+
+    }
+
     /// Buy an mint-on-demand nft
     #[payable]
     pub fn pay_and_mint(
       &mut self,
       nft_contract_id: AccountId,
+      template_id: String,
       price: U128,
-      nft_seller_id: AccountId,
       token_id: TokenId,
-      metadata: TokenMetadata,
-      perpetual_royalties: Option<HashMap<AccountId, u16>>,
-      size: Option<usize>
+      perpetual_royalties: Option<HashMap<AccountId, u16>>,  // temporarily. 
     ) {
       require!(
         env::attached_deposit() >= (u128::from(price) + near_to_yoctonear(0.1)),
@@ -42,16 +93,37 @@ impl Contract {
         "You attached too much near. This function requires EXACTLY price + 0.1N."
       );
 
+      let max_num_of_mint = expect_lightweight(
+        self.max_mint.get(&template_id),
+        "Cannot find template id. Ensure template_id is correct or created!"
+      );
+
+      let mut minted = expect_lightweight(
+        self.minted.get(&template_id),
+        "Cannot find template id. Ensure template_id is correct or created!"
+      );
+
+      require!(
+        minted <= max_num_of_mint,
+        "This template has reached its max minting number. Cannot mint anymore."
+      );
+
+      minted += 1;
+      self.minted.insert(&template_id, &minted);
+
+      let nft_seller_id = expect_lightweight(
+        self.template_owner.get(&template_id),
+        "Cannot find template owner. Ensure template_id is correct or created!"
+      );
+
       Promise::new(nft_seller_id).transfer(price.into()).then(
         ext_self::on_nft_mint(
           price,
           nft_contract_id,
-
+          template_id,
           token_id,
-          metadata,
           env::signer_account_id(),  // receiver of NFT is signer. 
           perpetual_royalties,
-          size,
           Some(env::signer_account_id()),  // refund_to_signer
   
           env::current_account_id(),
@@ -72,12 +144,10 @@ impl Contract {
     pub fn pay_and_mint_unsafe(
       &mut self,
       nft_contract_id: AccountId,
+      template_id: String,
       price: U128,
-      nft_seller_id: AccountId,
       token_id: TokenId,
-      metadata: TokenMetadata,
-      perpetual_royalties: Option<HashMap<AccountId, u16>>,
-      size: Option<usize>
+      perpetual_royalties: Option<HashMap<AccountId, u16>>,  // temporarily. 
     ) {
       require!(
         env::attached_deposit() >= (u128::from(price) + near_to_yoctonear(0.1)),
@@ -92,6 +162,35 @@ impl Contract {
         "You attached too much near. This function requires EXACTLY price + 0.1N."
       );
 
+      let max_num_of_mint = expect_lightweight(
+        self.max_mint.get(&template_id),
+        "Cannot find template id. Ensure template_id is correct or created!"
+      );
+
+      let mut minted = expect_lightweight(
+        self.minted.get(&template_id),
+        "Cannot find template id. Ensure template_id is correct or created!"
+      );
+
+      require!(
+        minted <= max_num_of_mint,
+        "This template has reached its max minting number. Cannot mint anymore."
+      );
+
+      minted += 1;
+      self.minted.insert(&template_id, &minted);
+
+      let nft_seller_id = expect_lightweight(
+        self.template_owner.get(&template_id),
+        "Cannot find template owner. Ensure template_id is correct or created!"
+      );
+
+      let metadata = expect_lightweight(
+        self.template_metadata.get(&template_id),
+        "Cannot find template metadata. Ensure template_id is correct or created!"
+      );
+
+      let size = self.nft_size.get(&template_id);
       
       Promise::new(nft_seller_id).transfer(price.into()).then(
         // unsafe as mint irregardless of success or fail transfer money. 
@@ -99,14 +198,14 @@ impl Contract {
         ext_contract::nft_mint(
           token_id,
           metadata,
-          env::signer_account_id(),  // receiver of NFT is signer. 
+          env::signer_account_id(),
           perpetual_royalties,
           size,
-          Some(env::signer_account_id()),  // refund_to_signer
+          Some(env::signer_account_id()),
   
           nft_contract_id,
           near_to_yoctonear(0.1),
-          GAS_FOR_CALLBACK_AND_MINTING
+          GAS_FOR_MINTING
         )
       );
     }
@@ -304,15 +403,27 @@ impl Contract {
       &mut self,
       payment_amount: U128,
       nft_contract_id: AccountId,
-
+      template_id: String,
       token_id: TokenId,
-      metadata: TokenMetadata,
       receiver_id: AccountId,
       perpetual_royalties: Option<HashMap<AccountId, u16>>,
-      size: Option<usize>,
       refund_to_signer: Option<AccountId>,
     ) -> Promise {
       if is_promise_success() {
+  
+        let nft_seller_id = expect_lightweight(
+          self.template_owner.get(&template_id),
+          "Cannot find template owner. Ensure template_id is correct or created!"
+        );
+  
+        let metadata = expect_lightweight(
+          self.template_metadata.get(&template_id),
+          "Cannot find template metadata. Ensure template_id is correct or created!"
+        );
+  
+        let size = self.nft_size.get(&template_id);
+
+
         ext_contract::nft_mint(
           token_id,
           metadata,
@@ -345,12 +456,10 @@ trait ExtSelf {
     &mut self,
     payment_amount: U128,
     nft_contract_id: AccountId,
-
+    template_id: String,
     token_id: TokenId,
-    metadata: TokenMetadata,
     receiver_id: AccountId,
     perpetual_royalties: Option<HashMap<AccountId, u16>>,
-    size: Option<usize>,
     refund_to_signer: Option<AccountId>,
   ) -> Promise;
 }

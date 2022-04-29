@@ -70,6 +70,21 @@ pub struct Contract {
 
     // keep track of storage that accounts payed. 
     pub storage_deposits: LookupMap<AccountId, Balance>,
+
+    /// Owner of this template
+    pub template_owner: LookupMap<String, AccountId>,
+
+    /// define the templates
+    pub template_metadata: LookupMap<String, TokenMetadata>,
+
+    /// define template max mint size 
+    pub max_mint: LookupMap<String, u64>,
+
+    /// minted amount
+    pub minted: LookupMap<String, u64>,
+
+    /// will be deprecated: size of nft
+    pub nft_size: LookupMap<String, usize>,
 }
 
 
@@ -85,6 +100,11 @@ pub enum StorageKey {
     ByNFTTokenTypeInner { token_type_hash: CryptoHash },
     FTTokenIds,
     StorageDeposits,
+    TemplateOwner,
+    TokenTemplates,
+    TemplateSize,
+    Minted,
+    NFTSize
 }
 
 
@@ -98,6 +118,11 @@ impl Contract {
         by_owner_id: LookupMap::new(StorageKey::ByOwnerId),
         by_nft_contract_id: LookupMap::new(StorageKey::ByNFTContractId),
         storage_deposits: LookupMap::new(StorageKey::StorageDeposits),
+        template_owner: LookupMap::new(StorageKey::TemplateOwner),
+        template_metadata: LookupMap::new(StorageKey::TokenTemplates),
+        max_mint: LookupMap::new(StorageKey::TemplateSize),
+        minted: LookupMap::new(StorageKey::Minted),
+        nft_size: LookupMap::new(StorageKey::NFTSize),
       }
     }
 
