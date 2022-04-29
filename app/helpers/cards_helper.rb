@@ -9,4 +9,12 @@ module CardsHelper
       }
     )["result"]["result"].pack('c*'))
   end
+
+  def cards_to_disable(share_length)
+    if share_length <= 0 
+      "hidden"
+    else
+      ""
+    end
+  end
 end

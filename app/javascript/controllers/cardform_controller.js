@@ -1,13 +1,14 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = [ "owner", "sharer" ]
+  static targets = [ "owner", "sharer", "noone" ]
 
-  static values = {current: String}
+  static values = {current: String, length: Number}
 
   initialize() {
-    window.currentValue = this.currentValue;
+    window.lengthValue = this.lengthValue;
     this.showCurrentName()
+    this.showShareButton()
   }
 
   showCurrentName() {
@@ -19,6 +20,20 @@ export default class extends Controller {
 
     this.sharerTargets.forEach((element, _index) => {
       element.hidden = this.currentValue == account_id
+    })
+  }
+
+  showShareButton() {
+    this.ownerTargets.forEach((element, _index) => {
+      element.hidden = this.lengthValue == 0
+    })
+
+    this.sharerTargets.forEach((element, _index) => {
+      element.hidden = this.lengthValue == 0
+    })
+
+    this.nooneTargets.forEach((element, _index) => {
+      element.hidden = this.lengthValue != 0
     })
   }
 }

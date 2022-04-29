@@ -63,9 +63,10 @@ function movie_ticket(token_id) {
     "30000000000000",  // 30 TGas
     utils.format.parseNearAmount("1.1")
   ).then(
-    window.location.replace(
-      window.location.origin + "/cards/" + token_id
-    )
+    value => {
+      window.location.reload();
+    },
+    err => alert("Please login first."),
   );
 }
 
@@ -81,6 +82,11 @@ function zoo_ticket(token_id) {
     },
     "30000000000000",  // 30 TGas
     utils.format.parseNearAmount("3.6")
+  ).then(
+    value => {
+      window.location.reload();
+    },
+    err => alert("Please login first."),
   );
 }
 

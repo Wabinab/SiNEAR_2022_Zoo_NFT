@@ -1,6 +1,7 @@
 <% define_constants %>
 <% @token_info = get_token_by_id @token_id %>
 <% @metadata = @token_info["metadata"] %>
+<% @share_len = @token_info["shared_owners"].length %>
 
 <div class="row">
   <div class="col text-center">
@@ -32,7 +33,10 @@
         <h2 class="card-subtitle">Currently shared with:</h2>
 
         <%# If is owner %>
-        <div data-controller="cardform" data-cardform-current-value="<%= @token_info['owner_id'] %>">
+        <div data-controller="cardform" 
+            data-cardform-current-value="<%= @token_info['owner_id'] %>"
+            data-cardform-length-value="<%= @share_len %>"
+        >
           <div data-cardform-target="owner">
             <p class="card-text">
               <% @token_info["shared_owners"].each_with_index do |v, i| %>
@@ -49,8 +53,8 @@
 
               <div class="p-3 text-center">
                 <%= link_to "Share With", 
-                    "javascript:share_with('#{@token_info["shared_owners"].length}')", 
-                    class: "btn btn-outline-success" %>
+                    "javascript:share_with('#{@share_len}')", 
+                    class: "btn btn-outline-success #{cards_to_disable @share_len}" %>
               </div>
 
               <p>Note: Will ask for 0.1 N for storage; and refund the rest, everytime you change.</p>
@@ -68,6 +72,11 @@
                 <% end %>
               </ul>
             </p>
+          </div>
+
+          <%# If cannot share with anyone %>
+          <div data-cardform-target="noone">
+            <p class="card-text">No one</p>
           </div>
         </div>
 
