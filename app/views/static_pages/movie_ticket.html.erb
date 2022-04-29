@@ -18,7 +18,9 @@
     </div>
   </div>
   
-  <%= link_to "Buy Movie Ticket", "javascript:movie_ticket('#{@token_id}')", class: "btn btn-success" %>
+  
+  <%= link_to "Buy Movie Ticket", "javascript:movie_ticket('#{@token_id}')", 
+      class: "btn btn-success #{to_disable(@template_id)}" %>
 
   <p class="text-center">
     Numbers minted: 
