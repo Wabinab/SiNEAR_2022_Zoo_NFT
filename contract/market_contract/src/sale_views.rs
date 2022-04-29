@@ -10,6 +10,18 @@ impl Contract {
       U64(self.sales.len())
     }
 
+    /// Get number of ticket left for a certain template
+    pub fn get_tickets_left(
+      &self,
+      template_id: String
+    ) -> u64 {
+      if let Some(value) = self.minted.get(&template_id) {
+        value
+      } else {
+        0u64
+      }
+    }
+
     /// returns the number of sales for a given account
     /// (result is a string)
     pub fn get_supply_by_owner_id(&self, account_id: AccountId) -> U64 {
