@@ -32,44 +32,29 @@
         <h2 class="card-subtitle">Currently shared with:</h2>
 
         <p class="card-text">
-          <% @token_info["shared_owners"].each do |v| %>
-            <li><%= v %></li>
+          <% @token_info["shared_owners"].each_with_index do |v, i| %>
+            <%= form_with(model: @cards, remote: true, data: { turbo: false }) do |f| %>
+              <p><%= f.text_field '', value: v, class: 'form-control', id: "owner_#{i}" %></p>
+            <% end %>
           <% end %>
+
+          <%= form_with(model: @cards, remote: true, data: { turbo: false}) do |f| %>
+            <%= f.hidden_field '', value: params[:token_id], id: "token_id_card" %>
+          <% end %>
+
+          <div class="p-3 text-center">
+            <%= link_to "Share With", 
+                "javascript:share_with('#{@token_info["shared_owners"].length}')", 
+                class: "btn btn-outline-success" %>
+          </div>
+
+          <p>Note: Will ask for 0.1 N for storage; and refund the rest, everytime you change.</p>
+          <p>Can refund more than 0.1N if you use less storage than originally use. </p>
         </p>
       </div>
     </div>
   </div>
 
-  <a class="btn btn-primary btn-lg col-4 mx-auto"
-      data-bs-toggle="collapse" 
-      href="#collapseExample" 
-      role="button" 
-      aria-expanded="false" 
-      aria-controls="collapseExample"
-  >
-    Transfer
-  </a>
-
-  <div class="collapse" id="collapseExample">
-    <div class="d-flex align-items-center justify-content-center">
-        <%= form_with(model: @card, remote: true, data: { turbo: false }) do |f| %>
-          <%= f.label "Receiver-id:" %>
-          <%= f.text_field '', class: 'form-control', id: "receiver_id" %>
-
-          <%= f.hidden_field '', value: @token_id, id: "token_id" %>
-
-          <%= f.label "Percentage:" %>
-          <%= f.number_field '', in: 0.01..100.0, step: 0.01, class: 'form-control', id: "percentage" %>
-
-          <div class="p-3 text-center">
-            <%= link_to "Submit", "javascript:nft_transfer()", class: "btn btn-outline-success" %>
-          </div>
-
-          <p><strong>Please manually reload after transfer.</strong></p>
-          <p>If you type percentage value more than 100,<br> it would still work, but smart contract will panic.</p>
-        <% end %>
-    </div>
-  </div>
 </div>
 
 
