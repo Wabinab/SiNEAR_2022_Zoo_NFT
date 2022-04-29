@@ -31,26 +31,48 @@
 
         <h2 class="card-subtitle">Currently shared with:</h2>
 
-        <p class="card-text">
-          <% @token_info["shared_owners"].each_with_index do |v, i| %>
-            <%= form_with(model: @cards, remote: true, data: { turbo: false }) do |f| %>
-              <p><%= f.text_field '', value: v, class: 'form-control', id: "owner_#{i}" %></p>
-            <% end %>
-          <% end %>
+        <%# If is owner %>
+        <div data-controller="cardform" data-cardform-current-value="<%= @token_info['owner_id'] %>">
+          <div data-cardform-target="owner">
+            <p class="card-text">
+              <% @token_info["shared_owners"].each_with_index do |v, i| %>
+                <%= form_with(model: @cards, remote: true, data: { turbo: false }) do |f| %>
+                  <p>
+                    <%= f.text_field '', value: v, class: 'form-control', id: "owner_#{i}" %>
+                  </p>
+                <% end %>
+              <% end %>
 
-          <%= form_with(model: @cards, remote: true, data: { turbo: false}) do |f| %>
-            <%= f.hidden_field '', value: params[:token_id], id: "token_id_card" %>
-          <% end %>
+              <%= form_with(model: @cards, remote: true, data: { turbo: false}) do |f| %>
+                <%= f.hidden_field '', value: params[:token_id], id: "token_id_card" %>
+              <% end %>
 
-          <div class="p-3 text-center">
-            <%= link_to "Share With", 
-                "javascript:share_with('#{@token_info["shared_owners"].length}')", 
-                class: "btn btn-outline-success" %>
+              <div class="p-3 text-center">
+                <%= link_to "Share With", 
+                    "javascript:share_with('#{@token_info["shared_owners"].length}')", 
+                    class: "btn btn-outline-success" %>
+              </div>
+
+              <p>Note: Will ask for 0.1 N for storage; and refund the rest, everytime you change.</p>
+              <p>Can refund more than 0.1N if you use less storage than originally use. </p>
+            </p>
           </div>
 
-          <p>Note: Will ask for 0.1 N for storage; and refund the rest, everytime you change.</p>
-          <p>Can refund more than 0.1N if you use less storage than originally use. </p>
-        </p>
+          <%# If not owner %>
+          <%# Not the best because repeating stuffs; but oh well, easier to read. %>
+          <div data-cardform-target="sharer">
+            <p class="card-text">
+              <ul class="list-group">
+                <% @token_info["shared_owners"].each do |v| %>
+                  <li class="list-group-item"><%= v %></li>
+                <% end %>
+              </ul>
+            </p>
+          </div>
+        </div>
+
+        
+
       </div>
     </div>
   </div>
