@@ -8,28 +8,17 @@ export default class extends Controller {
   initialize() {
     window.lengthValue = this.lengthValue;
     this.showCurrentName()
-    this.showShareButton()
   }
 
   showCurrentName() {
     const account_id = window.walletConnection.getAccountId()
 
     this.ownerTargets.forEach((element, _index) => {
-      element.hidden = this.currentValue != account_id
+      element.hidden = this.currentValue != account_id || this.lengthValue == 0
     })
 
     this.sharerTargets.forEach((element, _index) => {
-      element.hidden = this.currentValue == account_id
-    })
-  }
-
-  showShareButton() {
-    this.ownerTargets.forEach((element, _index) => {
-      element.hidden = this.lengthValue == 0
-    })
-
-    this.sharerTargets.forEach((element, _index) => {
-      element.hidden = this.lengthValue == 0
+      element.hidden = this.currentValue == account_id || this.lengthValue == 0
     })
 
     this.nooneTargets.forEach((element, _index) => {
