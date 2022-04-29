@@ -79,6 +79,15 @@
         <%= f.label "Image URL:" %>
         <%= f.text_field '', class: 'form-control', id: 'card_img' %>
 
+        <%= f.label "Can be share with __ person:" %>
+        <%= f.number_field '', step: 1, class:'form-control', id: 'size' %>
+
+        <%= f.label "Template ID" %>
+        <%= f.text_field '', class: 'form-control', id: 'template_id' %>
+
+        <%= f.label "Max number of this NFT" %>
+        <%= f.number_field '', step: 1, class: 'form-control', id: 'max_num_of_mint' %>
+
         <div class="pt-3 d-flex justify-content-center align-items-center">
           <%= link_to "Generate Template", "javascript:generate_template()", 
               class: "btn btn-success" %>

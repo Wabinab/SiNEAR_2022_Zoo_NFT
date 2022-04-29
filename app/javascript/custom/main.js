@@ -54,6 +54,7 @@ function movie_ticket(token_id) {
   window.contract.pay_and_mint_unsafe(
     {
       "nft_contract_id": "zoo_nft.wabinab.testnet",
+      "template_id": "movie_tickets",
       "price": utils.format.parseNearAmount("1"),  // to be changed.
       "token_id": token_id,
       "issued_at": Math.floor(Date.now() / 1000),
@@ -74,6 +75,15 @@ function zoo_ticket() {
 
 
 function generate_template() {
+
+    var title = document.getElementById("template_title").value;
+    var description = document.getElementById("template_desc").value;
+    var media = document.getElementById("card_img").value;
+    var size = document.getElementById("size").value;
+
+    var template_id = document.getElementById("template_id").value;
+    var max_num_of_mint = document.getElementById("max_num_of_mint").value;
+
     window.contract.generate_template(
       {
         "template_owner": window.walletConnection.getAccountId(),
