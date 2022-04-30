@@ -107,3 +107,4 @@ explorer for whether it exists before or not; the token itself does not have to 
 
 ## References
 - https://github.com/near-examples/nft-tutorial
+- Images from Unsplash, Pexels. 
