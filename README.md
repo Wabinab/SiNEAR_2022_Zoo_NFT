@@ -21,6 +21,8 @@ WE don't restrict, however, which account can create template; anyone could use 
 
 That's it for the frontend. WE'll talk about techinical instructions in the next section, before coming to contract. So scroll down! 
 
+(P.S. Due to ones' noobness on frontend, there are some non-beautiful design one just don't know how to solve with Bootstrap v5 lol)
+
 ## Contract (see below, search with CTRL+F "Contract")
 
 ---
